@@ -1,0 +1,2203 @@
+openapi: 3.1.0
+info:
+  description: "\n<h3>Welcome to your ArchiveBox server's REST API <code>[v1 ALPHA]</code>\
+    \ homepage!</h3>\n<br/>\n<i><b>WARNING: This API is still in an early development\
+    \ stage and may change!</b></i>\n<br/>\n<ul>\n<li>⬅️ Manage your server: <a href=\"\
+    /admin/api/\"><b>Setup API Keys</b></a>, <a href=\"/admin/\">Go to your Server\
+    \ Admin UI</a>, <a href=\"/\">Go to your Snapshots list</a> \n<li>💬 Ask questions\
+    \ and get help here: <a href=\"https://zulip.archivebox.io\">ArchiveBox Chat Forum</a></li>\n\
+    <li>🐞 Report API bugs here: <a href=\"https://github.com/ArchiveBox/ArchiveBox/issues\"\
+    >Github Issues</a></li>\n<li>📚 ArchiveBox Documentation: <a href=\"https://github.com/ArchiveBox/ArchiveBox/wiki\"\
+    >Github Wiki</a></li>\n<li>📜 See the API source code: <a href=\"https://github.com/ArchiveBox/ArchiveBox/blob/dev/archivebox/api\"\
+    ><code>archivebox/api/</code></a></li>\n</ul>\n<small>Served by ArchiveBox v0.8.5rc50\
+    \ (<a href=\"https://github.com/ArchiveBox/ArchiveBox/commit/1dff8bae4043efb678c1a6fb517dfa7e7a211150\"\
+    ><code>1dff8bae</code></a>), API powered by <a href=\"https://django-ninja.dev/\"\
+    ><code>django-ninja</code></a>.</small>\n"
+  title: ArchiveBox API
+  version: 1.0.0
+servers:
+- url: /
+paths:
+  /api/v1/auth/get_api_token:
+    post:
+      operationId: api_v1_auth_get_api_token
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordAuthSchema'
+        required: true
+      responses:
+        "200":
+          description: OK
+      summary: Generate an API token for a given username & password (or currently
+        logged-in user)
+      tags:
+      - Authentication
+  /api/v1/auth/check_api_token:
+    post:
+      operationId: api_v1_auth_check_api_token
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenAuthSchema'
+        required: true
+      responses:
+        "200":
+          description: OK
+      summary: Validate an API token to make sure its valid and non-expired
+      tags:
+      - Authentication
+  /api/v1/core/archiveresults:
+    get:
+      description: List all ArchiveResult entries matching these filters.
+      operationId: api_v1_core_get_archiveresults
+      parameters:
+      - explode: true
+        in: query
+        name: id
+        required: false
+        schema:
+          nullable: true
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: search
+        required: false
+        schema:
+          nullable: true
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: snapshot_id
+        required: false
+        schema:
+          nullable: true
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: snapshot_url
+        required: false
+        schema:
+          nullable: true
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: snapshot_tag
+        required: false
+        schema:
+          nullable: true
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: status
+        required: false
+        schema:
+          nullable: true
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: output
+        required: false
+        schema:
+          nullable: true
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: extractor
+        required: false
+        schema:
+          nullable: true
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: cmd
+        required: false
+        schema:
+          nullable: true
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: pwd
+        required: false
+        schema:
+          nullable: true
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: cmd_version
+        required: false
+        schema:
+          nullable: true
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: created_at
+        required: false
+        schema:
+          format: date-time
+          nullable: true
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: created_at__gte
+        required: false
+        schema:
+          format: date-time
+          nullable: true
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: created_at__lt
+        required: false
+        schema:
+          format: date-time
+          nullable: true
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          default: 200
+          title: Limit
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          default: 0
+          title: Offset
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 0
+          title: Page
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedArchiveResultSchema'
+          description: OK
+      security:
+      - HeaderTokenAuth: []
+      - BearerTokenAuth: []
+      - QueryParamTokenAuth: []
+      - UsernameAndPasswordAuth: []
+      summary: Get Archiveresults
+      tags:
+      - Core Models
+  /api/v1/core/archiveresult/{archiveresult_id}:
+    get:
+      description: Get a specific ArchiveResult by id or abid.
+      operationId: api_v1_core_get_archiveresult
+      parameters:
+      - explode: false
+        in: path
+        name: archiveresult_id
+        required: true
+        schema:
+          title: Archiveresult Id
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArchiveResultSchema'
+          description: OK
+      security:
+      - HeaderTokenAuth: []
+      - BearerTokenAuth: []
+      - QueryParamTokenAuth: []
+      - UsernameAndPasswordAuth: []
+      summary: Get Archiveresult
+      tags:
+      - Core Models
+  /api/v1/core/snapshots:
+    get:
+      description: List all Snapshot entries matching these filters.
+      operationId: api_v1_core_get_snapshots
+      parameters:
+      - explode: true
+        in: query
+        name: id
+        required: false
+        schema:
+          nullable: true
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: abid
+        required: false
+        schema:
+          nullable: true
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: created_by_id
+        required: false
+        schema:
+          title: Created By Id
+          type: string
+          q: created_by_id
+        style: form
+      - explode: true
+        in: query
+        name: created_by_username
+        required: false
+        schema:
+          title: Created By Username
+          type: string
+          q: created_by__username__icontains
+        style: form
+      - explode: true
+        in: query
+        name: created_at__gte
+        required: false
+        schema:
+          format: date-time
+          title: Created At  Gte
+          type: string
+          q: created_at__gte
+        style: form
+      - explode: true
+        in: query
+        name: created_at__lt
+        required: false
+        schema:
+          format: date-time
+          title: Created At  Lt
+          type: string
+          q: created_at__lt
+        style: form
+      - explode: true
+        in: query
+        name: created_at
+        required: false
+        schema:
+          format: date-time
+          title: Created At
+          type: string
+          q: created_at
+        style: form
+      - explode: true
+        in: query
+        name: modified_at
+        required: false
+        schema:
+          format: date-time
+          title: Modified At
+          type: string
+          q: modified_at
+        style: form
+      - explode: true
+        in: query
+        name: modified_at__gte
+        required: false
+        schema:
+          format: date-time
+          title: Modified At  Gte
+          type: string
+          q: modified_at__gte
+        style: form
+      - explode: true
+        in: query
+        name: modified_at__lt
+        required: false
+        schema:
+          format: date-time
+          title: Modified At  Lt
+          type: string
+          q: modified_at__lt
+        style: form
+      - explode: true
+        in: query
+        name: search
+        required: false
+        schema:
+          nullable: true
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: url
+        required: false
+        schema:
+          nullable: true
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: tag
+        required: false
+        schema:
+          nullable: true
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: title
+        required: false
+        schema:
+          nullable: true
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: timestamp
+        required: false
+        schema:
+          nullable: true
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: bookmarked_at__gte
+        required: false
+        schema:
+          format: date-time
+          nullable: true
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: bookmarked_at__lt
+        required: false
+        schema:
+          format: date-time
+          nullable: true
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: with_archiveresults
+        required: false
+        schema:
+          default: false
+          title: With Archiveresults
+          type: boolean
+        style: form
+      - explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          default: 200
+          title: Limit
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          default: 0
+          title: Offset
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 0
+          title: Page
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedSnapshotSchema'
+          description: OK
+      security:
+      - HeaderTokenAuth: []
+      - BearerTokenAuth: []
+      - QueryParamTokenAuth: []
+      - UsernameAndPasswordAuth: []
+      summary: Get Snapshots
+      tags:
+      - Core Models
+  /api/v1/core/snapshot/{snapshot_id}:
+    get:
+      description: Get a specific Snapshot by abid or id.
+      operationId: api_v1_core_get_snapshot
+      parameters:
+      - explode: false
+        in: path
+        name: snapshot_id
+        required: true
+        schema:
+          title: Snapshot Id
+          type: string
+        style: simple
+      - explode: true
+        in: query
+        name: with_archiveresults
+        required: false
+        schema:
+          default: true
+          title: With Archiveresults
+          type: boolean
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SnapshotSchema'
+          description: OK
+      security:
+      - HeaderTokenAuth: []
+      - BearerTokenAuth: []
+      - QueryParamTokenAuth: []
+      - UsernameAndPasswordAuth: []
+      summary: Get Snapshot
+      tags:
+      - Core Models
+  /api/v1/core/tags:
+    get:
+      operationId: api_v1_core_get_tags
+      parameters:
+      - explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          default: 200
+          title: Limit
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          default: 0
+          title: Offset
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 0
+          title: Page
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedTagSchema'
+          description: OK
+      security:
+      - HeaderTokenAuth: []
+      - BearerTokenAuth: []
+      - QueryParamTokenAuth: []
+      - UsernameAndPasswordAuth: []
+      summary: Get Tags
+      tags:
+      - Core Models
+  /api/v1/core/tag/{tag_id}:
+    get:
+      operationId: api_v1_core_get_tag
+      parameters:
+      - explode: false
+        in: path
+        name: tag_id
+        required: true
+        schema:
+          title: Tag Id
+          type: string
+        style: simple
+      - explode: true
+        in: query
+        name: with_snapshots
+        required: false
+        schema:
+          default: true
+          title: With Snapshots
+          type: boolean
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagSchema'
+          description: OK
+      security:
+      - HeaderTokenAuth: []
+      - BearerTokenAuth: []
+      - QueryParamTokenAuth: []
+      - UsernameAndPasswordAuth: []
+      summary: Get Tag
+      tags:
+      - Core Models
+  /api/v1/core/any/{abid}:
+    get:
+      operationId: api_v1_core_get_any
+      parameters:
+      - explode: false
+        in: path
+        name: abid
+        required: true
+        schema:
+          title: Abid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+          description: OK
+      security:
+      - HeaderTokenAuth: []
+      - BearerTokenAuth: []
+      - QueryParamTokenAuth: []
+      - UsernameAndPasswordAuth: []
+      summary: Get Any
+      tags:
+      - Core Models
+  /api/v1/cli/add:
+    post:
+      operationId: api_v1_cli_cli_add
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddCommandSchema'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CLICommandResponseSchema'
+          description: OK
+      security:
+      - HeaderTokenAuth: []
+      - BearerTokenAuth: []
+      - QueryParamTokenAuth: []
+      - UsernameAndPasswordAuth: []
+      summary: "archivebox add [args] [urls]"
+      tags:
+      - ArchiveBox CLI Sub-Commands
+  /api/v1/cli/update:
+    post:
+      operationId: api_v1_cli_cli_update
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCommandSchema'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CLICommandResponseSchema'
+          description: OK
+      security:
+      - HeaderTokenAuth: []
+      - BearerTokenAuth: []
+      - QueryParamTokenAuth: []
+      - UsernameAndPasswordAuth: []
+      summary: "archivebox update [args] [filter_patterns]"
+      tags:
+      - ArchiveBox CLI Sub-Commands
+  /api/v1/cli/schedule:
+    post:
+      operationId: api_v1_cli_cli_schedule
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduleCommandSchema'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CLICommandResponseSchema'
+          description: OK
+      security:
+      - HeaderTokenAuth: []
+      - BearerTokenAuth: []
+      - QueryParamTokenAuth: []
+      - UsernameAndPasswordAuth: []
+      summary: "archivebox schedule [args] [import_path]"
+      tags:
+      - ArchiveBox CLI Sub-Commands
+  /api/v1/cli/list:
+    post:
+      operationId: api_v1_cli_cli_list
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListCommandSchema'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CLICommandResponseSchema'
+          description: OK
+      security:
+      - HeaderTokenAuth: []
+      - BearerTokenAuth: []
+      - QueryParamTokenAuth: []
+      - UsernameAndPasswordAuth: []
+      summary: "archivebox list [args] [filter_patterns]"
+      tags:
+      - ArchiveBox CLI Sub-Commands
+  /api/v1/cli/remove:
+    post:
+      operationId: api_v1_cli_cli_remove
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RemoveCommandSchema'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CLICommandResponseSchema'
+          description: OK
+      security:
+      - HeaderTokenAuth: []
+      - BearerTokenAuth: []
+      - QueryParamTokenAuth: []
+      - UsernameAndPasswordAuth: []
+      summary: "archivebox remove [args] [filter_patterns]"
+      tags:
+      - ArchiveBox CLI Sub-Commands
+components:
+  schemas:
+    PasswordAuthSchema:
+      description: Schema for a /get_api_token request
+      example:
+        password: password
+        username: username
+      properties:
+        username:
+          nullable: true
+          type: string
+        password:
+          nullable: true
+          type: string
+      title: PasswordAuthSchema
+    TokenAuthSchema:
+      description: Schema for a /check_api_token request
+      example:
+        token: token
+      properties:
+        token:
+          title: Token
+          type: string
+      required:
+      - token
+      title: TokenAuthSchema
+    ArchiveResultFilterSchema:
+      properties:
+        id:
+          nullable: true
+          type: string
+        search:
+          nullable: true
+          type: string
+        snapshot_id:
+          nullable: true
+          type: string
+        snapshot_url:
+          nullable: true
+          type: string
+        snapshot_tag:
+          nullable: true
+          type: string
+        status:
+          nullable: true
+          type: string
+        output:
+          nullable: true
+          type: string
+        extractor:
+          nullable: true
+          type: string
+        cmd:
+          nullable: true
+          type: string
+        pwd:
+          nullable: true
+          type: string
+        cmd_version:
+          nullable: true
+          type: string
+        created_at:
+          format: date-time
+          nullable: true
+          type: string
+        created_at__gte:
+          format: date-time
+          nullable: true
+          type: string
+        created_at__lt:
+          format: date-time
+          nullable: true
+          type: string
+      title: ArchiveResultFilterSchema
+    Input:
+      properties:
+        limit:
+          default: 200
+          title: Limit
+          type: integer
+        offset:
+          default: 0
+          title: Offset
+          type: integer
+        page:
+          default: 0
+          title: Page
+          type: integer
+      title: Input
+    ArchiveResultSchema:
+      example:
+        start_ts: 2000-01-23T04:56:07.000+00:00
+        cmd_version: cmd_version
+        snapshot_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        created_at: 2000-01-23T04:56:07.000+00:00
+        extractor: extractor
+        snapshot_url: snapshot_url
+        snapshot_timestamp: snapshot_timestamp
+        output: output
+        abid: abid
+        end_ts: 2000-01-23T04:56:07.000+00:00
+        snapshot_abid: snapshot_abid
+        created_by_username: created_by_username
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        created_by_id: created_by_id
+        cmd:
+        - cmd
+        - cmd
+        modified_at: 2000-01-23T04:56:07.000+00:00
+        pwd: pwd
+        TYPE: core.models.ArchiveResult
+        snapshot_tags:
+        - snapshot_tags
+        - snapshot_tags
+        status: status
+      properties:
+        TYPE:
+          default: core.models.ArchiveResult
+          title: Type
+          type: string
+        id:
+          format: uuid
+          title: Id
+          type: string
+        abid:
+          title: Abid
+          type: string
+        modified_at:
+          format: date-time
+          title: Modified At
+          type: string
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        created_by_id:
+          title: Created By Id
+          type: string
+        created_by_username:
+          title: Created By Username
+          type: string
+        extractor:
+          title: Extractor
+          type: string
+        cmd_version:
+          nullable: true
+          type: string
+        cmd:
+          items:
+            type: string
+          type: array
+        pwd:
+          title: Pwd
+          type: string
+        status:
+          title: Status
+          type: string
+        output:
+          title: Output
+          type: string
+        start_ts:
+          format: date-time
+          nullable: true
+          type: string
+        end_ts:
+          format: date-time
+          nullable: true
+          type: string
+        snapshot_id:
+          format: uuid
+          title: Snapshot Id
+          type: string
+        snapshot_abid:
+          title: Snapshot Abid
+          type: string
+        snapshot_timestamp:
+          title: Snapshot Timestamp
+          type: string
+        snapshot_url:
+          title: Snapshot Url
+          type: string
+        snapshot_tags:
+          items:
+            type: string
+          type: array
+      required:
+      - abid
+      - cmd
+      - cmd_version
+      - created_at
+      - created_by_id
+      - created_by_username
+      - end_ts
+      - extractor
+      - id
+      - modified_at
+      - output
+      - pwd
+      - snapshot_abid
+      - snapshot_id
+      - snapshot_tags
+      - snapshot_timestamp
+      - snapshot_url
+      - start_ts
+      - status
+      title: ArchiveResultSchema
+    PagedArchiveResultSchema:
+      example:
+        offset: 5
+        num_items: 2
+        limit: 5
+        total_pages: 6
+        page: 1
+        total_items: 0
+        items:
+        - start_ts: 2000-01-23T04:56:07.000+00:00
+          cmd_version: cmd_version
+          snapshot_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          created_at: 2000-01-23T04:56:07.000+00:00
+          extractor: extractor
+          snapshot_url: snapshot_url
+          snapshot_timestamp: snapshot_timestamp
+          output: output
+          abid: abid
+          end_ts: 2000-01-23T04:56:07.000+00:00
+          snapshot_abid: snapshot_abid
+          created_by_username: created_by_username
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          created_by_id: created_by_id
+          cmd:
+          - cmd
+          - cmd
+          modified_at: 2000-01-23T04:56:07.000+00:00
+          pwd: pwd
+          TYPE: core.models.ArchiveResult
+          snapshot_tags:
+          - snapshot_tags
+          - snapshot_tags
+          status: status
+        - start_ts: 2000-01-23T04:56:07.000+00:00
+          cmd_version: cmd_version
+          snapshot_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          created_at: 2000-01-23T04:56:07.000+00:00
+          extractor: extractor
+          snapshot_url: snapshot_url
+          snapshot_timestamp: snapshot_timestamp
+          output: output
+          abid: abid
+          end_ts: 2000-01-23T04:56:07.000+00:00
+          snapshot_abid: snapshot_abid
+          created_by_username: created_by_username
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          created_by_id: created_by_id
+          cmd:
+          - cmd
+          - cmd
+          modified_at: 2000-01-23T04:56:07.000+00:00
+          pwd: pwd
+          TYPE: core.models.ArchiveResult
+          snapshot_tags:
+          - snapshot_tags
+          - snapshot_tags
+          status: status
+      properties:
+        total_items:
+          title: Total Items
+          type: integer
+        total_pages:
+          title: Total Pages
+          type: integer
+        page:
+          title: Page
+          type: integer
+        limit:
+          title: Limit
+          type: integer
+        offset:
+          title: Offset
+          type: integer
+        num_items:
+          title: Num Items
+          type: integer
+        items:
+          items:
+            $ref: '#/components/schemas/ArchiveResultSchema'
+          type: array
+      required:
+      - items
+      - limit
+      - num_items
+      - offset
+      - page
+      - total_items
+      - total_pages
+      title: PagedArchiveResultSchema
+    SnapshotFilterSchema:
+      properties:
+        id:
+          nullable: true
+          type: string
+        abid:
+          nullable: true
+          type: string
+        created_by_id:
+          title: Created By Id
+          type: string
+          q: created_by_id
+        created_by_username:
+          title: Created By Username
+          type: string
+          q: created_by__username__icontains
+        created_at__gte:
+          format: date-time
+          title: Created At  Gte
+          type: string
+          q: created_at__gte
+        created_at__lt:
+          format: date-time
+          title: Created At  Lt
+          type: string
+          q: created_at__lt
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+          q: created_at
+        modified_at:
+          format: date-time
+          title: Modified At
+          type: string
+          q: modified_at
+        modified_at__gte:
+          format: date-time
+          title: Modified At  Gte
+          type: string
+          q: modified_at__gte
+        modified_at__lt:
+          format: date-time
+          title: Modified At  Lt
+          type: string
+          q: modified_at__lt
+        search:
+          nullable: true
+          type: string
+        url:
+          nullable: true
+          type: string
+        tag:
+          nullable: true
+          type: string
+        title:
+          nullable: true
+          type: string
+        timestamp:
+          nullable: true
+          type: string
+        bookmarked_at__gte:
+          format: date-time
+          nullable: true
+          type: string
+        bookmarked_at__lt:
+          format: date-time
+          nullable: true
+          type: string
+      title: SnapshotFilterSchema
+    MinimalArchiveResultSchema:
+      example:
+        start_ts: 2000-01-23T04:56:07.000+00:00
+        cmd_version: cmd_version
+        created_at: 2000-01-23T04:56:07.000+00:00
+        extractor: extractor
+        output: output
+        abid: abid
+        end_ts: 2000-01-23T04:56:07.000+00:00
+        created_by_username: created_by_username
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        created_by_id: created_by_id
+        cmd:
+        - cmd
+        - cmd
+        modified_at: 2000-01-23T04:56:07.000+00:00
+        pwd: pwd
+        TYPE: core.models.ArchiveResult
+        status: status
+      properties:
+        TYPE:
+          default: core.models.ArchiveResult
+          title: Type
+          type: string
+        id:
+          format: uuid
+          title: Id
+          type: string
+        abid:
+          title: Abid
+          type: string
+        modified_at:
+          format: date-time
+          title: Modified At
+          type: string
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        created_by_id:
+          title: Created By Id
+          type: string
+        created_by_username:
+          title: Created By Username
+          type: string
+        extractor:
+          title: Extractor
+          type: string
+        cmd_version:
+          nullable: true
+          type: string
+        cmd:
+          items:
+            type: string
+          type: array
+        pwd:
+          title: Pwd
+          type: string
+        status:
+          title: Status
+          type: string
+        output:
+          title: Output
+          type: string
+        start_ts:
+          format: date-time
+          nullable: true
+          type: string
+        end_ts:
+          format: date-time
+          nullable: true
+          type: string
+      required:
+      - abid
+      - cmd
+      - cmd_version
+      - created_at
+      - created_by_id
+      - created_by_username
+      - end_ts
+      - extractor
+      - id
+      - modified_at
+      - output
+      - pwd
+      - start_ts
+      - status
+      title: MinimalArchiveResultSchema
+    PagedSnapshotSchema:
+      example:
+        offset: 5
+        num_items: 2
+        limit: 5
+        total_pages: 6
+        page: 1
+        total_items: 0
+        items:
+        - bookmarked_at: 2000-01-23T04:56:07.000+00:00
+          created_at: 2000-01-23T04:56:07.000+00:00
+          title: title
+          url: url
+          num_archiveresults: 7
+          tags:
+          - tags
+          - tags
+          abid: abid
+          downloaded_at: 2000-01-23T04:56:07.000+00:00
+          created_by_username: created_by_username
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          created_by_id: created_by_id
+          modified_at: 2000-01-23T04:56:07.000+00:00
+          archive_path: archive_path
+          TYPE: core.models.Snapshot
+          archiveresults:
+          - start_ts: 2000-01-23T04:56:07.000+00:00
+            cmd_version: cmd_version
+            created_at: 2000-01-23T04:56:07.000+00:00
+            extractor: extractor
+            output: output
+            abid: abid
+            end_ts: 2000-01-23T04:56:07.000+00:00
+            created_by_username: created_by_username
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            created_by_id: created_by_id
+            cmd:
+            - cmd
+            - cmd
+            modified_at: 2000-01-23T04:56:07.000+00:00
+            pwd: pwd
+            TYPE: core.models.ArchiveResult
+            status: status
+          - start_ts: 2000-01-23T04:56:07.000+00:00
+            cmd_version: cmd_version
+            created_at: 2000-01-23T04:56:07.000+00:00
+            extractor: extractor
+            output: output
+            abid: abid
+            end_ts: 2000-01-23T04:56:07.000+00:00
+            created_by_username: created_by_username
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            created_by_id: created_by_id
+            cmd:
+            - cmd
+            - cmd
+            modified_at: 2000-01-23T04:56:07.000+00:00
+            pwd: pwd
+            TYPE: core.models.ArchiveResult
+            status: status
+          timestamp: timestamp
+        - bookmarked_at: 2000-01-23T04:56:07.000+00:00
+          created_at: 2000-01-23T04:56:07.000+00:00
+          title: title
+          url: url
+          num_archiveresults: 7
+          tags:
+          - tags
+          - tags
+          abid: abid
+          downloaded_at: 2000-01-23T04:56:07.000+00:00
+          created_by_username: created_by_username
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          created_by_id: created_by_id
+          modified_at: 2000-01-23T04:56:07.000+00:00
+          archive_path: archive_path
+          TYPE: core.models.Snapshot
+          archiveresults:
+          - start_ts: 2000-01-23T04:56:07.000+00:00
+            cmd_version: cmd_version
+            created_at: 2000-01-23T04:56:07.000+00:00
+            extractor: extractor
+            output: output
+            abid: abid
+            end_ts: 2000-01-23T04:56:07.000+00:00
+            created_by_username: created_by_username
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            created_by_id: created_by_id
+            cmd:
+            - cmd
+            - cmd
+            modified_at: 2000-01-23T04:56:07.000+00:00
+            pwd: pwd
+            TYPE: core.models.ArchiveResult
+            status: status
+          - start_ts: 2000-01-23T04:56:07.000+00:00
+            cmd_version: cmd_version
+            created_at: 2000-01-23T04:56:07.000+00:00
+            extractor: extractor
+            output: output
+            abid: abid
+            end_ts: 2000-01-23T04:56:07.000+00:00
+            created_by_username: created_by_username
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            created_by_id: created_by_id
+            cmd:
+            - cmd
+            - cmd
+            modified_at: 2000-01-23T04:56:07.000+00:00
+            pwd: pwd
+            TYPE: core.models.ArchiveResult
+            status: status
+          timestamp: timestamp
+      properties:
+        total_items:
+          title: Total Items
+          type: integer
+        total_pages:
+          title: Total Pages
+          type: integer
+        page:
+          title: Page
+          type: integer
+        limit:
+          title: Limit
+          type: integer
+        offset:
+          title: Offset
+          type: integer
+        num_items:
+          title: Num Items
+          type: integer
+        items:
+          items:
+            $ref: '#/components/schemas/SnapshotSchema'
+          type: array
+      required:
+      - items
+      - limit
+      - num_items
+      - offset
+      - page
+      - total_items
+      - total_pages
+      title: PagedSnapshotSchema
+    SnapshotSchema:
+      example:
+        bookmarked_at: 2000-01-23T04:56:07.000+00:00
+        created_at: 2000-01-23T04:56:07.000+00:00
+        title: title
+        url: url
+        num_archiveresults: 7
+        tags:
+        - tags
+        - tags
+        abid: abid
+        downloaded_at: 2000-01-23T04:56:07.000+00:00
+        created_by_username: created_by_username
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        created_by_id: created_by_id
+        modified_at: 2000-01-23T04:56:07.000+00:00
+        archive_path: archive_path
+        TYPE: core.models.Snapshot
+        archiveresults:
+        - start_ts: 2000-01-23T04:56:07.000+00:00
+          cmd_version: cmd_version
+          created_at: 2000-01-23T04:56:07.000+00:00
+          extractor: extractor
+          output: output
+          abid: abid
+          end_ts: 2000-01-23T04:56:07.000+00:00
+          created_by_username: created_by_username
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          created_by_id: created_by_id
+          cmd:
+          - cmd
+          - cmd
+          modified_at: 2000-01-23T04:56:07.000+00:00
+          pwd: pwd
+          TYPE: core.models.ArchiveResult
+          status: status
+        - start_ts: 2000-01-23T04:56:07.000+00:00
+          cmd_version: cmd_version
+          created_at: 2000-01-23T04:56:07.000+00:00
+          extractor: extractor
+          output: output
+          abid: abid
+          end_ts: 2000-01-23T04:56:07.000+00:00
+          created_by_username: created_by_username
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          created_by_id: created_by_id
+          cmd:
+          - cmd
+          - cmd
+          modified_at: 2000-01-23T04:56:07.000+00:00
+          pwd: pwd
+          TYPE: core.models.ArchiveResult
+          status: status
+        timestamp: timestamp
+      properties:
+        TYPE:
+          default: core.models.Snapshot
+          title: Type
+          type: string
+        id:
+          format: uuid
+          title: Id
+          type: string
+        abid:
+          title: Abid
+          type: string
+        created_by_id:
+          title: Created By Id
+          type: string
+        created_by_username:
+          title: Created By Username
+          type: string
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        modified_at:
+          format: date-time
+          title: Modified At
+          type: string
+        bookmarked_at:
+          format: date-time
+          title: Bookmarked At
+          type: string
+        downloaded_at:
+          format: date-time
+          nullable: true
+          type: string
+        url:
+          title: Url
+          type: string
+        tags:
+          items:
+            type: string
+          type: array
+        title:
+          nullable: true
+          type: string
+        timestamp:
+          title: Timestamp
+          type: string
+        archive_path:
+          title: Archive Path
+          type: string
+        num_archiveresults:
+          title: Num Archiveresults
+          type: integer
+        archiveresults:
+          items:
+            $ref: '#/components/schemas/MinimalArchiveResultSchema'
+          type: array
+      required:
+      - abid
+      - archive_path
+      - archiveresults
+      - bookmarked_at
+      - created_at
+      - created_by_id
+      - created_by_username
+      - downloaded_at
+      - id
+      - modified_at
+      - num_archiveresults
+      - tags
+      - timestamp
+      - title
+      - url
+      title: SnapshotSchema
+    PagedTagSchema:
+      example:
+        offset: 5
+        num_items: 2
+        limit: 5
+        total_pages: 6
+        page: 1
+        total_items: 0
+        items:
+        - snapshots:
+          - bookmarked_at: 2000-01-23T04:56:07.000+00:00
+            created_at: 2000-01-23T04:56:07.000+00:00
+            title: title
+            url: url
+            num_archiveresults: 7
+            tags:
+            - tags
+            - tags
+            abid: abid
+            downloaded_at: 2000-01-23T04:56:07.000+00:00
+            created_by_username: created_by_username
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            created_by_id: created_by_id
+            modified_at: 2000-01-23T04:56:07.000+00:00
+            archive_path: archive_path
+            TYPE: core.models.Snapshot
+            archiveresults:
+            - start_ts: 2000-01-23T04:56:07.000+00:00
+              cmd_version: cmd_version
+              created_at: 2000-01-23T04:56:07.000+00:00
+              extractor: extractor
+              output: output
+              abid: abid
+              end_ts: 2000-01-23T04:56:07.000+00:00
+              created_by_username: created_by_username
+              id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+              created_by_id: created_by_id
+              cmd:
+              - cmd
+              - cmd
+              modified_at: 2000-01-23T04:56:07.000+00:00
+              pwd: pwd
+              TYPE: core.models.ArchiveResult
+              status: status
+            - start_ts: 2000-01-23T04:56:07.000+00:00
+              cmd_version: cmd_version
+              created_at: 2000-01-23T04:56:07.000+00:00
+              extractor: extractor
+              output: output
+              abid: abid
+              end_ts: 2000-01-23T04:56:07.000+00:00
+              created_by_username: created_by_username
+              id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+              created_by_id: created_by_id
+              cmd:
+              - cmd
+              - cmd
+              modified_at: 2000-01-23T04:56:07.000+00:00
+              pwd: pwd
+              TYPE: core.models.ArchiveResult
+              status: status
+            timestamp: timestamp
+          - bookmarked_at: 2000-01-23T04:56:07.000+00:00
+            created_at: 2000-01-23T04:56:07.000+00:00
+            title: title
+            url: url
+            num_archiveresults: 7
+            tags:
+            - tags
+            - tags
+            abid: abid
+            downloaded_at: 2000-01-23T04:56:07.000+00:00
+            created_by_username: created_by_username
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            created_by_id: created_by_id
+            modified_at: 2000-01-23T04:56:07.000+00:00
+            archive_path: archive_path
+            TYPE: core.models.Snapshot
+            archiveresults:
+            - start_ts: 2000-01-23T04:56:07.000+00:00
+              cmd_version: cmd_version
+              created_at: 2000-01-23T04:56:07.000+00:00
+              extractor: extractor
+              output: output
+              abid: abid
+              end_ts: 2000-01-23T04:56:07.000+00:00
+              created_by_username: created_by_username
+              id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+              created_by_id: created_by_id
+              cmd:
+              - cmd
+              - cmd
+              modified_at: 2000-01-23T04:56:07.000+00:00
+              pwd: pwd
+              TYPE: core.models.ArchiveResult
+              status: status
+            - start_ts: 2000-01-23T04:56:07.000+00:00
+              cmd_version: cmd_version
+              created_at: 2000-01-23T04:56:07.000+00:00
+              extractor: extractor
+              output: output
+              abid: abid
+              end_ts: 2000-01-23T04:56:07.000+00:00
+              created_by_username: created_by_username
+              id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+              created_by_id: created_by_id
+              cmd:
+              - cmd
+              - cmd
+              modified_at: 2000-01-23T04:56:07.000+00:00
+              pwd: pwd
+              TYPE: core.models.ArchiveResult
+              status: status
+            timestamp: timestamp
+          abid: abid
+          name: name
+          num_snapshots: 7
+          created_at: 2000-01-23T04:56:07.000+00:00
+          created_by_username: created_by_username
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          created_by_id: created_by_id
+          modified_at: 2000-01-23T04:56:07.000+00:00
+          TYPE: core.models.Tag
+          slug: slug
+        - snapshots:
+          - bookmarked_at: 2000-01-23T04:56:07.000+00:00
+            created_at: 2000-01-23T04:56:07.000+00:00
+            title: title
+            url: url
+            num_archiveresults: 7
+            tags:
+            - tags
+            - tags
+            abid: abid
+            downloaded_at: 2000-01-23T04:56:07.000+00:00
+            created_by_username: created_by_username
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            created_by_id: created_by_id
+            modified_at: 2000-01-23T04:56:07.000+00:00
+            archive_path: archive_path
+            TYPE: core.models.Snapshot
+            archiveresults:
+            - start_ts: 2000-01-23T04:56:07.000+00:00
+              cmd_version: cmd_version
+              created_at: 2000-01-23T04:56:07.000+00:00
+              extractor: extractor
+              output: output
+              abid: abid
+              end_ts: 2000-01-23T04:56:07.000+00:00
+              created_by_username: created_by_username
+              id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+              created_by_id: created_by_id
+              cmd:
+              - cmd
+              - cmd
+              modified_at: 2000-01-23T04:56:07.000+00:00
+              pwd: pwd
+              TYPE: core.models.ArchiveResult
+              status: status
+            - start_ts: 2000-01-23T04:56:07.000+00:00
+              cmd_version: cmd_version
+              created_at: 2000-01-23T04:56:07.000+00:00
+              extractor: extractor
+              output: output
+              abid: abid
+              end_ts: 2000-01-23T04:56:07.000+00:00
+              created_by_username: created_by_username
+              id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+              created_by_id: created_by_id
+              cmd:
+              - cmd
+              - cmd
+              modified_at: 2000-01-23T04:56:07.000+00:00
+              pwd: pwd
+              TYPE: core.models.ArchiveResult
+              status: status
+            timestamp: timestamp
+          - bookmarked_at: 2000-01-23T04:56:07.000+00:00
+            created_at: 2000-01-23T04:56:07.000+00:00
+            title: title
+            url: url
+            num_archiveresults: 7
+            tags:
+            - tags
+            - tags
+            abid: abid
+            downloaded_at: 2000-01-23T04:56:07.000+00:00
+            created_by_username: created_by_username
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            created_by_id: created_by_id
+            modified_at: 2000-01-23T04:56:07.000+00:00
+            archive_path: archive_path
+            TYPE: core.models.Snapshot
+            archiveresults:
+            - start_ts: 2000-01-23T04:56:07.000+00:00
+              cmd_version: cmd_version
+              created_at: 2000-01-23T04:56:07.000+00:00
+              extractor: extractor
+              output: output
+              abid: abid
+              end_ts: 2000-01-23T04:56:07.000+00:00
+              created_by_username: created_by_username
+              id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+              created_by_id: created_by_id
+              cmd:
+              - cmd
+              - cmd
+              modified_at: 2000-01-23T04:56:07.000+00:00
+              pwd: pwd
+              TYPE: core.models.ArchiveResult
+              status: status
+            - start_ts: 2000-01-23T04:56:07.000+00:00
+              cmd_version: cmd_version
+              created_at: 2000-01-23T04:56:07.000+00:00
+              extractor: extractor
+              output: output
+              abid: abid
+              end_ts: 2000-01-23T04:56:07.000+00:00
+              created_by_username: created_by_username
+              id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+              created_by_id: created_by_id
+              cmd:
+              - cmd
+              - cmd
+              modified_at: 2000-01-23T04:56:07.000+00:00
+              pwd: pwd
+              TYPE: core.models.ArchiveResult
+              status: status
+            timestamp: timestamp
+          abid: abid
+          name: name
+          num_snapshots: 7
+          created_at: 2000-01-23T04:56:07.000+00:00
+          created_by_username: created_by_username
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          created_by_id: created_by_id
+          modified_at: 2000-01-23T04:56:07.000+00:00
+          TYPE: core.models.Tag
+          slug: slug
+      properties:
+        total_items:
+          title: Total Items
+          type: integer
+        total_pages:
+          title: Total Pages
+          type: integer
+        page:
+          title: Page
+          type: integer
+        limit:
+          title: Limit
+          type: integer
+        offset:
+          title: Offset
+          type: integer
+        num_items:
+          title: Num Items
+          type: integer
+        items:
+          items:
+            $ref: '#/components/schemas/TagSchema'
+          type: array
+      required:
+      - items
+      - limit
+      - num_items
+      - offset
+      - page
+      - total_items
+      - total_pages
+      title: PagedTagSchema
+    TagSchema:
+      example:
+        snapshots:
+        - bookmarked_at: 2000-01-23T04:56:07.000+00:00
+          created_at: 2000-01-23T04:56:07.000+00:00
+          title: title
+          url: url
+          num_archiveresults: 7
+          tags:
+          - tags
+          - tags
+          abid: abid
+          downloaded_at: 2000-01-23T04:56:07.000+00:00
+          created_by_username: created_by_username
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          created_by_id: created_by_id
+          modified_at: 2000-01-23T04:56:07.000+00:00
+          archive_path: archive_path
+          TYPE: core.models.Snapshot
+          archiveresults:
+          - start_ts: 2000-01-23T04:56:07.000+00:00
+            cmd_version: cmd_version
+            created_at: 2000-01-23T04:56:07.000+00:00
+            extractor: extractor
+            output: output
+            abid: abid
+            end_ts: 2000-01-23T04:56:07.000+00:00
+            created_by_username: created_by_username
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            created_by_id: created_by_id
+            cmd:
+            - cmd
+            - cmd
+            modified_at: 2000-01-23T04:56:07.000+00:00
+            pwd: pwd
+            TYPE: core.models.ArchiveResult
+            status: status
+          - start_ts: 2000-01-23T04:56:07.000+00:00
+            cmd_version: cmd_version
+            created_at: 2000-01-23T04:56:07.000+00:00
+            extractor: extractor
+            output: output
+            abid: abid
+            end_ts: 2000-01-23T04:56:07.000+00:00
+            created_by_username: created_by_username
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            created_by_id: created_by_id
+            cmd:
+            - cmd
+            - cmd
+            modified_at: 2000-01-23T04:56:07.000+00:00
+            pwd: pwd
+            TYPE: core.models.ArchiveResult
+            status: status
+          timestamp: timestamp
+        - bookmarked_at: 2000-01-23T04:56:07.000+00:00
+          created_at: 2000-01-23T04:56:07.000+00:00
+          title: title
+          url: url
+          num_archiveresults: 7
+          tags:
+          - tags
+          - tags
+          abid: abid
+          downloaded_at: 2000-01-23T04:56:07.000+00:00
+          created_by_username: created_by_username
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          created_by_id: created_by_id
+          modified_at: 2000-01-23T04:56:07.000+00:00
+          archive_path: archive_path
+          TYPE: core.models.Snapshot
+          archiveresults:
+          - start_ts: 2000-01-23T04:56:07.000+00:00
+            cmd_version: cmd_version
+            created_at: 2000-01-23T04:56:07.000+00:00
+            extractor: extractor
+            output: output
+            abid: abid
+            end_ts: 2000-01-23T04:56:07.000+00:00
+            created_by_username: created_by_username
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            created_by_id: created_by_id
+            cmd:
+            - cmd
+            - cmd
+            modified_at: 2000-01-23T04:56:07.000+00:00
+            pwd: pwd
+            TYPE: core.models.ArchiveResult
+            status: status
+          - start_ts: 2000-01-23T04:56:07.000+00:00
+            cmd_version: cmd_version
+            created_at: 2000-01-23T04:56:07.000+00:00
+            extractor: extractor
+            output: output
+            abid: abid
+            end_ts: 2000-01-23T04:56:07.000+00:00
+            created_by_username: created_by_username
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            created_by_id: created_by_id
+            cmd:
+            - cmd
+            - cmd
+            modified_at: 2000-01-23T04:56:07.000+00:00
+            pwd: pwd
+            TYPE: core.models.ArchiveResult
+            status: status
+          timestamp: timestamp
+        abid: abid
+        name: name
+        num_snapshots: 7
+        created_at: 2000-01-23T04:56:07.000+00:00
+        created_by_username: created_by_username
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        created_by_id: created_by_id
+        modified_at: 2000-01-23T04:56:07.000+00:00
+        TYPE: core.models.Tag
+        slug: slug
+      properties:
+        TYPE:
+          default: core.models.Tag
+          title: Type
+          type: string
+        id:
+          format: uuid
+          title: Id
+          type: string
+        abid:
+          title: Abid
+          type: string
+        modified_at:
+          format: date-time
+          title: Modified At
+          type: string
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        created_by_id:
+          title: Created By Id
+          type: string
+        created_by_username:
+          title: Created By Username
+          type: string
+        name:
+          title: Name
+          type: string
+        slug:
+          title: Slug
+          type: string
+        num_snapshots:
+          title: Num Snapshots
+          type: integer
+        snapshots:
+          items:
+            $ref: '#/components/schemas/SnapshotSchema'
+          type: array
+      required:
+      - abid
+      - created_at
+      - created_by_id
+      - created_by_username
+      - id
+      - modified_at
+      - name
+      - num_snapshots
+      - slug
+      - snapshots
+      title: TagSchema
+    CLICommandResponseSchema:
+      example:
+        result:
+        - ""
+        - ""
+        stdout: stdout
+        success: true
+        stderr: stderr
+        errors:
+        - errors
+        - errors
+      properties:
+        success:
+          title: Success
+          type: boolean
+        errors:
+          items:
+            type: string
+          type: array
+        result:
+          $ref: '#/components/schemas/Result'
+        stdout:
+          title: Stdout
+          type: string
+        stderr:
+          title: Stderr
+          type: string
+      required:
+      - errors
+      - result
+      - stderr
+      - stdout
+      - success
+      title: CLICommandResponseSchema
+    AddCommandSchema:
+      example:
+        init: false
+        urls:
+        - urls
+        - urls
+        depth: 0
+        extractors: ""
+        parser: auto
+        update: false
+        update_all: false
+        tag: ""
+        overwrite: false
+        index_only: false
+      properties:
+        urls:
+          items:
+            type: string
+          type: array
+        tag:
+          default: ""
+          title: Tag
+          type: string
+        depth:
+          default: 0
+          title: Depth
+          type: integer
+        update:
+          default: false
+          title: Update
+          type: boolean
+        update_all:
+          default: false
+          title: Update All
+          type: boolean
+        index_only:
+          default: false
+          title: Index Only
+          type: boolean
+        overwrite:
+          default: false
+          title: Overwrite
+          type: boolean
+        init:
+          default: false
+          title: Init
+          type: boolean
+        extractors:
+          default: ""
+          title: Extractors
+          type: string
+        parser:
+          default: auto
+          title: Parser
+          type: string
+      required:
+      - urls
+      title: AddCommandSchema
+    StatusChoices:
+      enum:
+      - indexed
+      - archived
+      - unarchived
+      - present
+      - valid
+      - invalid
+      - duplicate
+      - orphaned
+      - corrupted
+      - unrecognized
+      title: StatusChoices
+      type: string
+    UpdateCommandSchema:
+      example:
+        resume: 0.8008281904610115
+        extractors: extractors
+        before: 1.4658129805029452
+        filter_type: filter_type
+        filter_patterns:
+        - filter_patterns
+        - filter_patterns
+        after: 6.027456183070403
+        only_new: true
+        overwrite: false
+        index_only: false
+        status: indexed
+      properties:
+        resume:
+          nullable: true
+          type: number
+        only_new:
+          default: true
+          title: Only New
+          type: boolean
+        index_only:
+          default: false
+          title: Index Only
+          type: boolean
+        overwrite:
+          default: false
+          title: Overwrite
+          type: boolean
+        after:
+          nullable: true
+          type: number
+        before:
+          nullable: true
+          type: number
+        status:
+          $ref: '#/components/schemas/StatusChoices'
+        filter_type:
+          nullable: true
+          type: string
+        filter_patterns:
+          items:
+            type: string
+          nullable: true
+          type: array
+        extractors:
+          nullable: true
+          type: string
+      title: UpdateCommandSchema
+    ScheduleCommandSchema:
+      example:
+        add: false
+        import_path: import_path
+        depth: 0
+        clear: false
+        update: false
+        tag: ""
+        every: every
+        overwrite: false
+      properties:
+        import_path:
+          nullable: true
+          type: string
+        add:
+          default: false
+          title: Add
+          type: boolean
+        every:
+          nullable: true
+          type: string
+        tag:
+          default: ""
+          title: Tag
+          type: string
+        depth:
+          default: 0
+          title: Depth
+          type: integer
+        overwrite:
+          default: false
+          title: Overwrite
+          type: boolean
+        update:
+          default: false
+          title: Update
+          type: boolean
+        clear:
+          default: false
+          title: Clear
+          type: boolean
+      title: ScheduleCommandSchema
+    ListCommandSchema:
+      example:
+        with_headers: false
+        as_json: true
+        filter_type: substring
+        before: 6.027456183070403
+        filter_patterns:
+        - filter_patterns
+        - filter_patterns
+        after: 0.8008281904610115
+        sort: bookmarked_at
+        as_html: false
+        as_csv: As_Csv
+        status: indexed
+      properties:
+        filter_patterns:
+          items:
+            type: string
+          nullable: true
+          type: array
+        filter_type:
+          default: substring
+          title: Filter Type
+          type: string
+        status:
+          $ref: '#/components/schemas/StatusChoices'
+        after:
+          nullable: true
+          type: number
+        before:
+          nullable: true
+          type: number
+        sort:
+          default: bookmarked_at
+          title: Sort
+          type: string
+        as_json:
+          default: true
+          title: As Json
+          type: boolean
+        as_html:
+          default: false
+          title: As Html
+          type: boolean
+        as_csv:
+          $ref: '#/components/schemas/As_Csv'
+        with_headers:
+          default: false
+          title: With Headers
+          type: boolean
+      title: ListCommandSchema
+    RemoveCommandSchema:
+      example:
+        before: 6.027456183070403
+        filter_type: exact
+        filter_patterns:
+        - filter_patterns
+        - filter_patterns
+        after: 0.8008281904610115
+        delete: true
+      properties:
+        delete:
+          default: true
+          title: Delete
+          type: boolean
+        after:
+          nullable: true
+          type: number
+        before:
+          nullable: true
+          type: number
+        filter_type:
+          default: exact
+          title: Filter Type
+          type: string
+        filter_patterns:
+          items:
+            type: string
+          nullable: true
+          type: array
+      title: RemoveCommandSchema
+    Response:
+      anyOf:
+      - $ref: '#/components/schemas/SnapshotSchema'
+      - $ref: '#/components/schemas/ArchiveResultSchema'
+      - $ref: '#/components/schemas/TagSchema'
+      title: Response
+    Result:
+      anyOf:
+      - items: {}
+        type: array
+      - type: object
+      - type: boolean
+      - type: integer
+      - type: string
+      nullable: true
+      title: Result
+    As_Csv:
+      anyOf:
+      - type: string
+      - type: boolean
+      default: "timestamp,url"
+      title: As Csv
+  securitySchemes:
+    HeaderTokenAuth:
+      in: header
+      name: X-ArchiveBox-API-Key
+      type: apiKey
+    BearerTokenAuth:
+      scheme: bearer
+      type: http
+    QueryParamTokenAuth:
+      in: query
+      name: api_key
+      type: apiKey
+    UsernameAndPasswordAuth:
+      scheme: basic
+      type: http
